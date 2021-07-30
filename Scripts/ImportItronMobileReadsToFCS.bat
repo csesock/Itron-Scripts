@@ -6,6 +6,6 @@ xcopy /Y "%cd%\ItronMobile.sqlite" "C:\Program Files\Itron\Field Collection Syst
 rename "C:\Program Files\Itron\Field Collection System\comm\fcs\work\ima\ItronMobile.sqlite" "ItronMobile.req"
 echo ...
 ping 127.0.0.1 -n 2 > nul
-echo Readings Imported into FCS
+echo Readings will be automatically imported into FCS shortly
 ping 127.0.0.1 -n 2 > nul
 pause
