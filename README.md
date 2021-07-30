@@ -5,3 +5,4 @@ Collection of scripts that are useful when working with Itron software. Scripts 
 * Import Itron Mobile Reads to FCS.bat
 * Movie Files to FCS Input.ba
 * RestartFCSServices.bat
+* ReadingAdjustmentToo.py
