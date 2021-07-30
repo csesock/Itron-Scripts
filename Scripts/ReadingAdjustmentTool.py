@@ -1,36 +1,36 @@
-import os, sys, time
+# Author: Chris Sesock on 7/30/2021
+# This tool will truncate n number of digits from an upload.dat file
+# and then create a new file with the corrected readings.
+#
+
+import os, sys
+from time import sleep
 
 original = []
+correct = []
+
+def load(n):
+    for i in range(n):
+        sleep(0.1)
+        print(f"{i/n*100:.1f} %", end="\r")  
 
 def getReadings(digits):
     digits = int(digits)
     try:
         with open('upload.dat', 'r') as openfile:
-            with open('corrected.txt', 'w') as builtfile:
-                for line in openfile:
-                    if line.startswith('RDG'):
-                        #original.append(line[33:43])
-                        if digits == 0:
-                            reading = line[33:43] #Reading N*10 Bytes 34-43
-                            #print(reading)
-                            original.append(reading)
-                            builtfile.write(reading+'\n')
-                        elif digits == 1:
-                            reading = str('0')+line[33:42]
-                            #print(reading)
-                            builtfile.write(reading+'\n')
-                        elif digits == 2:
-                            reading = str('00')+line[33:41]
-                            #print(reading)
-                            builtfile.write(reading+'\n')
+            for line in openfile:
+                if line.startswith('RDG'):
+                    reading = line[33:43] #Reading N*10 Bytes 34-43
+                    original.append(reading)
+        with open('corrected.txt', 'w') as builtfile:
+            for i in original:
+                c = str(i[:-digits]).rjust(10, '0') #truncate from the right n digits and then left-pad with n zeroes
+                builtfile.write(c+'\n')
     except FileNotFoundError:
         print("Error: File Not Found")
-    except:
-        print("Unknown Error Exists")
                 
 def enterCorrectedReadings(digits):
     try:
-        correct = []
         with open('corrected.txt', 'r') as cor:
             for line in cor:
                 correct.append(line.strip().rstrip())
@@ -53,40 +53,38 @@ def enterCorrectedReadings(digits):
         return
 
 def testReadings():
+    counter=1
     try:
-        with open('upload--corrected.dat', 'r') as openfile:
-            rdg = ""
-            rff = ""
-            counter = 1
-            index = 0
-            print("Line # \tNew Reading \tOriginal Reading")
-            print("----------------------------------------------")
-            for line in openfile:
-                if line.startswith('RDG'):
-                    rdg = line[33:43]
-                if line.startswith('RFF'):
-                    rff = line[72:82]
-                    print(str(counter)+"\t"+rdg+"\t"+rff)
-                    #print(str(counter)+'\t'+rdg+'\t'+original[index])
+        with open('Reading changes.txt', 'w') as builtfile:
+            builtfile.write("Line # \tOriginal Reading \tAdjusted Reading\n")
+            builtfile.write("----------------------------------------------\n")
+            for i in range(len(original)):
+                line = str(counter)+'\t'+original[i]+'\t\t'+correct[i]+'\n'
+                builtfile.write(line)
                 counter+=1
-                index+=1
     except:
-        print('ERROR')
+        print("An Error Occured")
 
 if __name__ == "__main__":
-    print("Reading Adjustment Tool v0.0.1")
-    #filename = input("Enter the name of the file (should be upload.dat by default): ").strip()
+    print("United Systems Reading Adjustment Tool [Version 0.0.3]")
+    print("(c) 2021 United Systems and Software, Inc.")
+    print()
+    print("Searching for upload.dat file...")
+    load(10)  
+    if os.path.isfile('upload.dat'):
+        print("Upload.dat file found. ")
+    else:
+        print("Upload.dat file not found. Please place upload.dat file in the same directory as this tool.")
+        os.system("pause")
+        quit()
     digits = input("Enter the number of digits to drop from all current readings: ")
     print("Gathering adjusted readings...")
     getReadings(digits)
-    
+    load(10)    
     print("Entering corrected readings into new upload file...")
-    time.sleep(2)
+    load(10)
     enterCorrectedReadings(digits)
-    
     print("Corrected readings entered into new file : upload -- corrected.dat")
-    answer = input("Would you like to compare adjusted readings? (Y or N): ")
-    print()
-    if answer.upper() == "Y":
-        testReadings()
+    testReadings()
+    print("Readings adjusted. See 'Reading changes.txt' for reading comparisons.")
     os.system("pause")
