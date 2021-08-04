@@ -2,30 +2,21 @@
 # This tool will truncate n number of digits from an upload.dat file
 # and then create a new file with the corrected readings.
 #
-
 import os, sys
 from time import sleep
 
 original = []
 correct = []
 
-def load(n):
-    for i in range(n):
-        sleep(0.1)
-        print(f"{i/n*100:.1f} %", end="\r")  
-
 def getReadings(digits):
     try:
         with open('upload.dat', 'r') as openfile:
             for line in openfile:
                 if line.startswith('RDG'):
-                    reading = line[33:43] #Reading N*10 Bytes 34-43
+                    reading = line[33:43]       #Reading N*10 Bytes 34-43
                     original.append(reading)
-        #with open('corrected.txt', 'w') as builtfile:
         for i in original:
-            c = str(i[:-digits]).rjust(10, '0') #truncates n digits from the right of the value, pads to required length (10)
-            #builtfile.write(c+'\n')
-            correct.append(c)
+            correct.append(str(i[:-digits]).rjust(10, '0'))
     except FileNotFoundError:
         print("Error: File Not Found")
                 
@@ -33,16 +24,12 @@ def enterCorrectedReadings(digits):
     counter = 0
     try:
         with open('upload.dat', 'r') as openfile:
-            with open('upload--corrected.dat', 'w') as builtfile:
+            with open('Upload - Corrected.dat', 'w') as builtfile:
                 for line in openfile:
                     if line.startswith('RDG'):
                         line = line.replace(line[33:43], correct[counter])
                         counter+=1
                     builtfile.write(line)
-    except FileNotFoundError:
-        print("Error: File Not Found")
-    except FileExistsError:
-        print("Error: File Already Exists")
     except:
         print("Unknown Error Occured")
         return
@@ -50,7 +37,7 @@ def enterCorrectedReadings(digits):
 def testReadings():
     counter=1
     try:
-        with open('Reading changes.txt', 'w') as builtfile:
+        with open('Reading Changes.txt', 'w') as builtfile:
             builtfile.write("Line # \tOriginal Reading \tAdjusted Reading\n")
             builtfile.write("----------------------------------------------\n")
             for i in range(len(original)):
@@ -58,28 +45,36 @@ def testReadings():
                 builtfile.write(line)
                 counter+=1
     except:
-        print("An Error Occured")
+        print("Unknown Error Occured")
+
+def testReadingsExcel():
+    counter = 1
+    try:
+        with open('Reading Changes.csv', 'w') as builtfile:
+            builtfile.write('Line,Original Reading,Adjusted Reading\n')
+            for i in range(len(original)):
+                line = str(counter)+','+original[i]+','+correct[i]+'\n'
+                builtfile.write(line)
+                counter+=1
+    except:
+        print("Unknown Error Occured")
 
 if __name__ == "__main__":
-    print("United Systems Reading Adjustment Tool [Version 0.0.3]")
+    print("United Systems Reading Adjustment Tool [Version 0.0.4]")
     print("(c) 2021 United Systems and Software, Inc.")
     print()
-    print("Searching for upload.dat file...")
-    load(10)  
+    print("Searching for Upload.dat file . . .")
     if os.path.isfile('upload.dat'):
         print("Upload.dat file found. ")
     else:
-        print("Upload.dat file not found. Please place upload.dat file in the same directory as this tool.")
+        print("Upload.dat file not found. Please place Upload.dat file in the same directory as this tool.")
         os.system("pause")
         quit()
     digits = int(input("Enter the number of digits to drop from all current readings: "))
-    print("Gathering adjusted readings...")
-    getReadings(digits)
-    load(10)    
-    print("Entering corrected readings into new upload file...")
-    load(10)
+    getReadings(digits) 
     enterCorrectedReadings(digits)
-    print("Corrected readings entered into new file : upload -- corrected.dat")
-    testReadings()
-    print("Readings adjusted. See 'Reading changes.txt' for reading comparisons.")
+    testReadingsExcel()
+    print()
+    print("Corrected readings entered into new file: Upload - Corrected.dat")
+    print("See 'Reading changes.txt' for reading comparisons.")
     os.system("pause")
