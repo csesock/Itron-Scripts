@@ -15,30 +15,25 @@ def load(n):
         print(f"{i/n*100:.1f} %", end="\r")  
 
 def getReadings(digits):
-    digits = int(digits)
     try:
         with open('upload.dat', 'r') as openfile:
             for line in openfile:
                 if line.startswith('RDG'):
                     reading = line[33:43] #Reading N*10 Bytes 34-43
                     original.append(reading)
-        with open('corrected.txt', 'w') as builtfile:
-            for i in original:
-                c = str(i[:-digits]).rjust(10, '0') #truncate from the right n digits and then left-pad with n zeroes
-                builtfile.write(c+'\n')
+        #with open('corrected.txt', 'w') as builtfile:
+        for i in original:
+            c = str(i[:-digits]).rjust(10, '0') #truncates n digits from the right of the value, pads to required length (10)
+            #builtfile.write(c+'\n')
+            correct.append(c)
     except FileNotFoundError:
         print("Error: File Not Found")
                 
 def enterCorrectedReadings(digits):
+    counter = 0
     try:
-        with open('corrected.txt', 'r') as cor:
-            for line in cor:
-                correct.append(line.strip().rstrip())
         with open('upload.dat', 'r') as openfile:
             with open('upload--corrected.dat', 'w') as builtfile:
-                counter = 0
-                rdg = ""    # RDG 34:43 -> 33:43
-                rff = ""    # RFF 73:82 -> 72:82
                 for line in openfile:
                     if line.startswith('RDG'):
                         line = line.replace(line[33:43], correct[counter])
@@ -77,7 +72,7 @@ if __name__ == "__main__":
         print("Upload.dat file not found. Please place upload.dat file in the same directory as this tool.")
         os.system("pause")
         quit()
-    digits = input("Enter the number of digits to drop from all current readings: ")
+    digits = int(input("Enter the number of digits to drop from all current readings: "))
     print("Gathering adjusted readings...")
     getReadings(digits)
     load(10)    
