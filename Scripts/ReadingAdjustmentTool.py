@@ -38,24 +38,22 @@ def testReadings():
     counter=1
     try:
         with open('Reading Changes.txt', 'w') as builtfile:
-            builtfile.write("Line # \tOriginal Reading \tAdjusted Reading\n")
+            builtfile.write("Original Reading \tAdjusted Reading\n")
             builtfile.write("----------------------------------------------\n")
             for i in range(len(original)):
-                line = str(counter)+'\t'+original[i]+'\t\t'+correct[i]+'\n'
+                line = original[i]+'\t\t'+correct[i]+'\n'
                 builtfile.write(line)
                 counter+=1
     except:
         print("Unknown Error Occured")
 
 def testReadingsExcel():
-    counter = 1
     try:
         with open('Reading Changes.csv', 'w') as builtfile:
-            builtfile.write('Line,Original Reading,Adjusted Reading\n')
+            builtfile.write('Original Reading,Adjusted Reading\n')
             for i in range(len(original)):
-                line = str(counter)+','+original[i]+','+correct[i]+'\n'
-                builtfile.write(line)
-                counter+=1
+                current_line = original[i]+','+correct[i]+'\n'
+                builtfile.write(current_line)
     except:
         print("Unknown Error Occured")
 
@@ -76,5 +74,5 @@ if __name__ == "__main__":
     testReadingsExcel()
     print()
     print("Corrected readings entered into new file: Upload - Corrected.dat")
-    print("See 'Reading changes.txt' for reading comparisons.")
+    print("See 'Reading changes.csv' for reading comparisons.")
     os.system("pause")
