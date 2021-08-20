@@ -1,6 +1,6 @@
 import os
 
-def adjustDownloadFile(record, index, value):
+def adjustDownloadFile(record, index, value, is_space):
     try:
         with open('download.dat', 'r') as openfile:
             with open('download--adjusted.dat', 'w') as builtfile:
@@ -8,7 +8,10 @@ def adjustDownloadFile(record, index, value):
                     if line.startswith(record):
                         index = int(index)
                         x = line[index-1]
-                        if x.isspace():
+                        if is_space.upper() == 'Y':
+                            if x.isspace():
+                                line=line[::index-1]+value+line[index::]
+                        else:
                             line=line[::index-1]+value+line[index::]
                     builtfile.write(line)
     except:
@@ -29,8 +32,9 @@ if __name__ == "__main__":
     record = input('Enter the record in the file to be adjusted (CUS, MTR): ')
     index = input('Enter the index to adjust (10, 34): ')
     value = input('Enter the new value to be placed at that index (W, L): ')
+    is_space = input('Do you want to update only if the value is currently blank? (Y or N): ')
 
-    adjustDownloadFile(record, index, value)
+    adjustDownloadFile(record, index, value, is_space)
     print('Adjusted download file entered into new file: download--adjusted.dat')
     
     os.system('pause')
