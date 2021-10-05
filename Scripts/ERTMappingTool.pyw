@@ -1,10 +1,54 @@
 import os
+import tkinter as tk
+from tkinter import *
+from tkinter import ttk
+from tkinter.filedialog import asksaveasfile
+
+window = tk.Tk()
+window.geometry('320x250+500+500')
+window.title('ERT Mapping Tool v0.1')
+window.resizable(False, False)
+s = ttk.Style().theme_use('xpnative')
+current_file = ''
+
+file_label = ttk.Label(text="Current file:").place(x=40, y=30)
+file = tk.StringVar()
+current_file = ttk.Label(textvariable=file).place(x=120, y=30)
+file.set("None")
+
+ert_label = ttk.Label(text="ERT Number: ").place(x=40, y=80)
+ert_entry = ttk.Entry(width=25)
+ert_entry.place(x=120, y=80)
+
+ert_model_label = ttk.Label(text="ERT Model: ").place(x=40, y=110)
+ert_model = tk.StringVar()
+ert_model_output = ttk.Label(textvariable=ert_model).place(x=120, y=110)
+ert_model.set("None")
+
+calculate_one_button = ttk.Button(text="Calculate", width=15, command=lambda:ert_model.set(str((mapERTNumber(ert_entry.get()))))).place(x=60, y=160)
+calculate_multi_button = ttk.Button(text="Calculate File", width=15, command=lambda:mapMultiple(current_file)).place(x=160, y=160)
+
+load_file_button = ttk.Button(text="Load File...", width=15, command=lambda:loadFile()).place(x=60, y=185)
+reset_button = ttk.Button(text="Reset", width=15, command=lambda:reset()).place(x=160, y=185)
+
+def loadFile():
+    filename = tk.filedialog.askopenfilename(title="Open File")
+    file.set(str(os.path.basename(filename)))
+    global current_file
+    current_file = str(os.path.basename(filename))
+
+def reset():
+    file.set("None")
+    ert_model.set("None")
+    ert_entry.delete(0, 'end')
 
 def mapERTNumber(ert_number):
-    ert_number = int(ert_number)
+    try:
+        ert_number = int(ert_number)
+    except ValueError:
+        return "Invalid Value"
     if ert_number < 1400000:
-        print('ERT number too small')
-        return
+        return('ERT number too small')
     elif ert_number >= 14000000 and ert_number < 16149999:
         return '40W'
     elif ert_number >= 16150000 and ert_number < 16273848:
@@ -64,11 +108,20 @@ def mapERTNumber(ert_number):
     elif ert_number >= 79000000 and ert_number < 79999999:
         return '100W Phase 4 w/LS'
     elif ert_number >79999999:
-        print("ERT number too large")
-        return
+        return("ERT number too large")
+
+def mapMultiple(filename):
+    built_line = ''
+    try:
+        with open(filename, 'r') as openfile:
+            with open('ERT Models.txt', 'w') as builtfile:
+                builtfile.write("ERT# \tERT Model\n")
+                builtfile.write("---------------------\n")
+                for line in openfile:
+                    built_line = str(line.strip())+'\t'+str(mapERTNumber(line))+'\n'
+                    builtfile.write(built_line)
+    except FileNotFoundError:
+        print("Error: File Not Found")
 
 if __name__=='__main__':
-    print("ERT Mapping Tools [version 0.0.1]")
-    ert_number = input("Enter the ERT number to search: ")
-    print(mapERTNumber(ert_number))
-    os.system('pause')
+    window.mainloop()
