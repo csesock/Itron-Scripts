@@ -4,6 +4,7 @@ from tkinter import *
 from tkinter import ttk
 from tkinter.filedialog import asksaveasfile
 
+# window settings
 window = tk.Tk()
 window.geometry('420x225+500+500')
 window.title('ERT Mapping Tool v0.2')
@@ -11,6 +12,7 @@ window.resizable(False, False)
 s = ttk.Style().theme_use('xpnative')
 current_file = ''
 
+# UI labels
 file_label = ttk.Label(text="Current File:").place(x=30, y=30)
 file = tk.StringVar()
 current_file = ttk.Label(textvariable=file, foreground='#0317fc').place(x=120, y=30)
@@ -25,6 +27,7 @@ ert_model = tk.StringVar()
 ert_model_output = ttk.Label(textvariable=ert_model, foreground='#0317fc').place(x=120, y=110)
 ert_model.set("None")
 
+# radio buttons
 radio_frame = ttk.LabelFrame(text="File Type", padding=(5, 5))
 radio_frame.place(x=297, y=55)
 d = tk.IntVar(value=1)
@@ -34,12 +37,14 @@ radio_1.grid(row=0, column=0, padx=5, pady=6, sticky="nsew")
 radio_2 = ttk.Radiobutton(radio_frame, text="DAT File", variable=d, value=2)
 radio_2.grid(row=1, column=0, padx=5, pady=5, sticky="nsew")
 
+# UI buttons
 calculate_one_button = ttk.Button(text="Map ERT", width=13, command=lambda:ert_model.set(str((mapERTNumber(ert_entry.get()))))).place(x=30, y=170)
 calculate_multi_button = ttk.Button(text="Map File", width=13, command=lambda:mapChoice(current_file)).place(x=120, y=170)
 
 load_file_button = ttk.Button(text="Load File...", width=13, command=lambda:loadFile()).place(x=210, y=170)
 reset_button = ttk.Button(text="Reset", width=13, command=lambda:reset()).place(x=300, y=170)
 
+# internal functions
 def loadFile():
     filename = tk.filedialog.askopenfilename(title="Open File")
     file.set(str(os.path.basename(filename)))
