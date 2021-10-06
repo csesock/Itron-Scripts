@@ -5,37 +5,46 @@ from tkinter import ttk
 from tkinter.filedialog import asksaveasfile
 
 window = tk.Tk()
-window.geometry('320x250+500+500')
-window.title('ERT Mapping Tool v0.1')
+window.geometry('420x225+500+500')
+window.title('ERT Mapping Tool v0.2')
 window.resizable(False, False)
 s = ttk.Style().theme_use('xpnative')
 current_file = ''
 
-file_label = ttk.Label(text="Current file:").place(x=40, y=30)
+file_label = ttk.Label(text="Current File:").place(x=30, y=30)
 file = tk.StringVar()
-current_file = ttk.Label(textvariable=file).place(x=120, y=30)
+current_file = ttk.Label(textvariable=file, foreground='#0317fc').place(x=120, y=30)
 file.set("None")
 
-ert_label = ttk.Label(text="ERT Number: ").place(x=40, y=80)
+ert_label = ttk.Label(text="ERT Number: ").place(x=30, y=80)
 ert_entry = ttk.Entry(width=25)
 ert_entry.place(x=120, y=80)
 
-ert_model_label = ttk.Label(text="ERT Model: ").place(x=40, y=110)
+ert_model_label = ttk.Label(text="ERT Model: ").place(x=30, y=110)
 ert_model = tk.StringVar()
-ert_model_output = ttk.Label(textvariable=ert_model).place(x=120, y=110)
+ert_model_output = ttk.Label(textvariable=ert_model, foreground='#0317fc').place(x=120, y=110)
 ert_model.set("None")
 
-calculate_one_button = ttk.Button(text="Calculate", width=15, command=lambda:ert_model.set(str((mapERTNumber(ert_entry.get()))))).place(x=60, y=160)
-calculate_multi_button = ttk.Button(text="Calculate File", width=15, command=lambda:mapMultiple(current_file)).place(x=160, y=160)
+radio_frame = ttk.LabelFrame(text="File Type", padding=(5, 5))
+radio_frame.place(x=297, y=55)
+d = tk.IntVar(value=1)
 
-load_file_button = ttk.Button(text="Load File...", width=15, command=lambda:loadFile()).place(x=60, y=185)
-reset_button = ttk.Button(text="Reset", width=15, command=lambda:reset()).place(x=160, y=185)
+radio_1 = ttk.Radiobutton(radio_frame, text="ERT File", variable=d, value=1)
+radio_1.grid(row=0, column=0, padx=5, pady=6, sticky="nsew")
+radio_2 = ttk.Radiobutton(radio_frame, text="DAT File", variable=d, value=2)
+radio_2.grid(row=1, column=0, padx=5, pady=5, sticky="nsew")
+
+calculate_one_button = ttk.Button(text="Map ERT", width=13, command=lambda:ert_model.set(str((mapERTNumber(ert_entry.get()))))).place(x=30, y=170)
+calculate_multi_button = ttk.Button(text="Map File", width=13, command=lambda:mapChoice(current_file)).place(x=120, y=170)
+
+load_file_button = ttk.Button(text="Load File...", width=13, command=lambda:loadFile()).place(x=210, y=170)
+reset_button = ttk.Button(text="Reset", width=13, command=lambda:reset()).place(x=300, y=170)
 
 def loadFile():
     filename = tk.filedialog.askopenfilename(title="Open File")
     file.set(str(os.path.basename(filename)))
     global current_file
-    current_file = str(os.path.basename(filename))
+    current_file = str(filename)
 
 def reset():
     file.set("None")
@@ -110,6 +119,24 @@ def mapERTNumber(ert_number):
     elif ert_number >79999999:
         return("ERT number too large")
 
+def parseDownloadFile(filename):
+    try:
+        with open(filename, 'r') as openfile:
+            with open('ERTs.txt', 'w') as builtfile:
+                for line in openfile:
+                    if line.startswith('RFF'):
+                        ert = line[11:21]
+                        builtfile.write(str(ert)+'\n')
+    except FileNotFoundError:
+        print("Error: File Not Found")
+
+def mapChoice(filename):
+    if d.get() == 1:
+        mapMultiple(filename)
+    elif d.get() == 2:
+        parseDownloadFile(filename)
+        mapMultiple('ERTs.txt')
+
 def mapMultiple(filename):
     built_line = ''
     try:
@@ -121,7 +148,7 @@ def mapMultiple(filename):
                     built_line = str(line.strip())+'\t'+str(mapERTNumber(line))+'\n'
                     builtfile.write(built_line)
     except FileNotFoundError:
-        print("Error: File Not Found")
+        print("Error: File Not Found")            
 
 if __name__=='__main__':
     window.mainloop()
