@@ -3,8 +3,8 @@ from tkinter import *
 from tkinter import ttk
 
 window = tk.Tk()
-window.geometry('350x220+500+500')
-window.title('P Comp Calculator v0.01')
+window.geometry('355x220+500+500')
+window.title('P Comp Calculator v0.2')
 window.resizable(False, False)
 s = ttk.Style().theme_use('xpnative')
 
@@ -35,8 +35,8 @@ actual_pcomp_text.set('0')
 rounded_pcomp_text = tk.StringVar()
 rounded_pcomp_text.set('0')
 
-actual_pcomp_value = ttk.Label(textvariable=actual_pcomp_text).place(x=150, y=110)
-rounded_pcomp_value = ttk.Label(textvariable=rounded_pcomp_text).place(x=150, y=135)
+actual_pcomp_value = ttk.Label(textvariable=actual_pcomp_text, foreground='#0317fc').place(x=150, y=110)
+rounded_pcomp_value = ttk.Label(textvariable=rounded_pcomp_text, foreground='#0317fc').place(x=150, y=135)
 
 def calculate_pcomp():
     p_comp = float(lowest_billing_hand_entry.get())/(float(gear_ratio_entry.get())*float(drive_rate_entry.get()))
