@@ -6,62 +6,53 @@ import os
 import psutil
 import time, threading
 
-itron_services = [ 
-    'FCSAdjustHighLowLimits',
-    'FCSAdministrator',
-    'FCSAdvancedAMRExport',
-    'FCSApplyOutOfRouteReads',
-    'FCSBackupRoute',
-    'FDCommunicationService',
-    'FCSDailyAssignments',
-    'FCSDeleteRoute',
-    'FCSExport',
-    'FCSForceComplete',
-    'FCSGenerateAdvAMRRequests',
-    'FCSGenerateStatistics',
-    'FCSImport',
-    'FCSImportCommonReading',
-    'FCSImportPreprocessor',
-    'FCSIntervalDataExport',
-    'FCSLeakSensorExport',
-    'FCSOutOfRouteReadsExport',
-    'FCSRestoreRoute',
-    'FCSRouteSmartService',
-    'FCSSKMS',
-    'FCSTemporaryRouting',
-    'Itron.Mobile.FCS.MobileServices']
 
-def getServicesStatus():
-    zero_if_working = 0
-    for service in itron_services:
-        value = printService(service)
-        zero_if_working += value
-    if zero_if_working == 0:
-        status.set("Online")
-        status_output.config(fg="green")
-    elif zero_if_working > 0 and zero_if_working < len(itron_services):
-        status.set("Mixed")
-        status_output.config(fg="orange")
-    elif zero_if_working == len(itron_services):
-        status.set("Offline")
-        status_output.config(fg="red")
-    threading.Timer(3, getServicesStatus).start()
+##itron_services = [ 
+##    'FCSAdjustHighLowLimits',
+##    'FCSAdministrator',
+##    'FCSAdvancedAMRExport',
+##    'FCSApplyOutOfRouteReads',
+##    'FCSBackupRoute',
+##    'FDCommunicationService',
+##    'FCSDailyAssignments',
+##    'FCSDeleteRoute',
+##    'FCSExport',
+##    'FCSForceComplete',
+##    'FCSGenerateAdvAMRRequests',
+##    'FCSGenerateStatistics',
+##    'FCSImport',
+##    'FCSImportCommonReading',
+##    'FCSImportPreprocessor',
+##    'FCSIntervalDataExport',
+##    'FCSLeakSensorExport',
+##    'FCSOutOfRouteReadsExport',
+##    'FCSRestoreRoute',
+##    'FCSRouteSmartService',
+##    'FCSSKMS',
+##    'FCSTemporaryRouting',
+##    'Itron.Mobile.FCS.MobileServices']
+
+##def getServicesStatus():
+##    zero_if_working = 0
+##    for service in itron_services:
+##        value = printService(service)
+##        zero_if_working += value
+##    if zero_if_working == 0:
+##        status.set("Online")
+##        status_output.config(fg="green")
+##    elif zero_if_working > 0 and zero_if_working < len(itron_services):
+##        status.set("Mixed")
+##        status_output.config(fg="orange")
+##    elif zero_if_working == len(itron_services):
+##        status.set("Offline")
+##        status_output.config(fg="red")
+##    threading.Timer(3, getServicesStatus).start()
 
 def getSingleServiceStatus(name, textvar, label):
-    zero_if_working = 0
-    value = printService(name)
-    if zero_if_working == 0:
-        textvar.set("Online")
-        label.config(fg="green")
-    elif zero_if_working > 0 and zero_if_working < len(itron_services):
-        textvar.set("Mixed")
-        label.config(fg="orange")
-    elif zero_if_working == len(itron_services):
-        textvar.set("Offline")
-        label.config(fg="red")
-    threading.Timer(3, getSingleServiceStatus(name, textvar, label)).start()
+    getService(name, textvar, label)
+    threading.Timer(10, getSingleServiceStatus('FCSAdjustHighLowLimits', status1, output1)).start()
 
-def getService(name):
+def getService(name, textvar, label):
     service = None
     try:
         service = psutil.win_service_get(name)
@@ -69,16 +60,14 @@ def getService(name):
     except Exception as ex:
         # raise psutil.NoSuchProcess if no service with such name exists
         print(str(ex))
-
-    return service
-
-def printService(s):
-    service = getService(s)
-    
     if service and service['status'] == 'running':
-        return 0
-    else: 
-        return 1
+        #return 0
+        textvar.set("Online")
+        label.config(fg="green")
+    else:
+        #return 1
+        textvar.set("Offline")
+        label.config(fg="red")
 
 window = tk.Tk()
 window.geometry('280x520')
@@ -218,26 +207,12 @@ output21 = tk.Label(textvariable=status21)
 output21.place(x=210, y=460)
 status21.set("Online")
 
+update_button = tk.Button(text="Update", command=lambda:getSingleServiceStatus('FCSAdjustHighLowLimits', status1, output1)).place(x=20, y=400)
+
 if __name__=="__main__":
     #getServicesStatus()
-    getSingleServiceStatus('FCSAdjustHighLowLimits', status1, output1)
+    #getSingleServiceStatus('FCSAdjustHighLowLimits', status1, output1)
     window.mainloop()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
